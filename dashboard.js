@@ -240,3 +240,4 @@ function updateDashboard() {
 
 updateSidebarSlider(init.type);
 updateDashboard();
+
