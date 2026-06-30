@@ -1,0 +1,31 @@
+
+:root {
+  --primary-color:     #2563EB;
+  --secondary-color:   #14B8A6;
+  --background-color:  #F8FAFC;
+  --text-color:        #0F172A;
+
+  --primary-pale:  rgba(37, 99, 235, 0.22);
+  --secondary-pale: rgba(20, 184, 166, 0.22);
+  --primary-glow:  rgba(37, 99, 235, 0.35);
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Segoe UI', 'Tahoma', Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}

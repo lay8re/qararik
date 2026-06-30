@@ -1,0 +1,179 @@
+/* ================================================
+   Dashboard — Tablet (≤ 1024px)
+================================================ */
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    padding: 20px 24px 36px;
+  }
+
+  .dash-sidebar {
+    position: static;
+  }
+
+  .dash-top-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .gauge-wrap {
+    max-width: 220px;
+  }
+}
+
+/* ================================================
+   Dashboard — Mobile (≤ 768px)
+   النتائج أولاً، الشريط الجانبي في الأسفل
+================================================ */
+@media (max-width: 768px) {
+
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    padding: 14px 14px 36px;
+    gap: 14px;
+  }
+
+  /* النتائج تظهر أول، والتحكم في الأسفل */
+  .dash-main    { order: 1; }
+  .dash-sidebar { order: 2; position: static; }
+
+  /* الكروت العلوية تحت بعض */
+  .dash-top-row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* العداد — يأخذ العرض الكامل */
+  .gauge-wrap {
+    max-width: 260px;
+    margin: 0 auto;
+  }
+
+  /* حقول الإدخال — أكبر للمس باليد */
+  .sb-input,
+  .sb-select {
+    padding: 13px 14px;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+
+  /* Slider thumb — أكبر للمس */
+  .sb-slider::-webkit-slider-thumb {
+    width: 26px;
+    height: 26px;
+  }
+  .sb-slider::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* مقاسات النصوص */
+  .sidebar-title    { font-size: 1rem;    }
+  .sidebar-subtitle { font-size: 0.78rem; }
+  .gauge-dti        { font-size: 1.7rem;  }
+  .gauge-zone       { font-size: 0.75rem; }
+  .advisor-text     { font-size: 0.88rem; line-height: 1.7; }
+  .card-label       { font-size: 0.8rem;  }
+
+  /* أسطورة العداد — مضغوطة */
+  .gauge-legend { gap: 6px; }
+  .g-zone       { font-size: 0.68rem; padding: 3px 8px; }
+
+  /* المخطط */
+  .chart-wrap        { min-height: 200px; }
+  .chart-wrap canvas { max-height: 210px; }
+}
+
+/* ================================================
+   Dashboard — Small Mobile (≤ 480px)
+================================================ */
+@media (max-width: 480px) {
+
+  .dashboard-layout {
+    padding: 10px 10px 28px;
+    gap: 12px;
+  }
+
+  .dash-card,
+  .sidebar-card {
+    padding: 16px 14px;
+    border-radius: 14px;
+  }
+
+  .gauge-wrap  { max-width: 210px; }
+  .gauge-dti   { font-size: 1.4rem; }
+  .gauge-zone  { font-size: 0.7rem; }
+  .gn-val      { font-size: 0.78rem; }
+  .gn-lbl      { font-size: 0.65rem; }
+
+  #sbVal { font-size: 1.6rem; }
+
+  .sb-stat     { padding: 10px 12px; }
+  .sb-stat-lbl { font-size: 0.74rem; }
+  .sb-stat-val { font-size: 0.8rem;  }
+
+  .advisor-title { font-size: 0.88rem; }
+  .advisor-text  { font-size: 0.83rem; line-height: 1.65; }
+
+  .gauge-nums { gap: 6px; }
+  .gauge-num  { padding: 8px 6px; }
+}
+
+
+@media (max-width: 768px) {
+  .site-header {
+    padding: 16px 24px;
+  }
+
+  .hero {
+    padding: 32px 20px;
+    min-height: calc(100vh - 72px);
+  }
+
+  .hero-content {
+    gap: 22px;
+  }
+
+  .cta-btn {
+    padding: 13px 28px;
+    font-size: 0.97rem;
+  }
+}
+
+
+@media (max-width: 600px) {
+
+  .dashboard-layout {
+    padding: 14px 16px 28px;
+    gap: 16px;
+  }
+
+  .dash-card,
+  .sidebar-card {
+    padding: 18px 16px;
+    border-radius: 14px;
+  }
+
+  .gauge-dti { font-size: 1.4rem; }
+  .gn-val    { font-size: 0.8rem; }
+  #sbVal     { font-size: 1.8rem; }
+
+
+  .input-card    { padding: 28px 22px; }
+  .card-title    { font-size: 1.2rem;  }
+  .slider-value  { font-size: 2rem;    }
+  .type-name     { font-size: 0.82rem; }
+}
+
+@media (max-width: 480px) {
+  .logo-name {
+    font-size: 1.15rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+  }
+}

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>أدخل بياناتك — قرارك</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/background.css" />
+  <link rel="stylesheet" href="css/header.css" />
+  <link rel="stylesheet" href="css/inputs.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <img src="images/logo.PNG" alt="شعار قرارك" class="logo-img" />
+    </div>
+  </header>
+
+  <main class="inputs-main">
+
+    <div class="input-card" id="inputCard">
+
+      <div class="card-header">
+        <h2 class="card-title">أدخل بياناتك المالية</h2>
+        <p class="card-subtitle">سنحلل وضعك ونبني لك سيناريوهات دقيقة في ثوانٍ</p>
+      </div>
+
+      <form class="input-form" id="inputForm" onsubmit="return false">
+
+
+        <div class="field-group">
+          <label class="field-label">نوع البرنامج التمويلي</label>
+          <div class="type-selector" id="typeSelector">
+
+            <button type="button" class="type-btn" id="btnPersonal"
+                    onclick="selectType('personal')">
+              <span class="type-icon">👤</span>
+              <span class="type-name">تمويل شخصي</span>
+              <span class="type-hint">حتى 5 سنوات</span>
+            </button>
+
+            <button type="button" class="type-btn" id="btnRealEstate"
+                    onclick="selectType('realEstate')">
+              <span class="type-icon">🏠</span>
+              <span class="type-name">تمويل عقاري</span>
+              <span class="type-hint">حتى 30 سنة</span>
+            </button>
+
+          </div>
+          <span class="field-error" id="typeError">
+            ⚠ الرجاء اختيار نوع البرنامج التمويلي أولاً
+          </span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="salary">
+            <span class="field-icon">💵</span>
+            الراتب الشهري
+          </label>
+          <input id="salary" type="number" class="field-input" min="1"
+                 placeholder="أدخل راتبك الشهري بالريال" />
+          <span class="field-error" id="salaryError">
+            ⚠ الرجاء إدخال الراتب الشهري
+          </span>
+        </div>
+
+  
+        <div class="field-group">
+          <label class="field-label" for="loanAmount">
+            <span class="field-icon">💰</span>
+            مبلغ القرض المطلوب
+          </label>
+          <input id="loanAmount" type="number" class="field-input" min="1"
+                 placeholder="أدخل مبلغ القرض الذي تخطط له" />
+          <span class="field-error" id="loanError">
+            ⚠ الرجاء إدخال مبلغ القرض
+          </span>
+        </div>
+
+
+        <div class="field-group">
+          <label class="field-label">مدة السداد</label>
+          <div class="slider-wrapper">
+            <div class="slider-display">
+              <span class="slider-value" id="sliderValue">3</span>
+              <span class="slider-unit"  id="sliderUnit">سنوات</span>
+            </div>
+            <input type="range" id="durationSlider" class="field-slider"
+                   min="1" max="5" step="1" value="3" />
+            <div class="slider-ticks" id="sliderTicks">
+              <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="field-group">
+          <label class="field-label" for="obligations">
+            <span class="field-icon">💳</span>
+            الالتزامات الشهرية الحالية
+          </label>
+          <input id="obligations" type="number" class="field-input" min="0"
+                 placeholder="أدخل مجموع أقساطك الحالية إن وجدت، أو اكتب 0" />
+          <span class="field-error" id="obligationsError">
+            ⚠ الرجاء إدخال الالتزامات الحالية (أو اكتب 0 إن لم يكن لديك)
+          </span>
+        </div>
+
+     
+        <button type="button" class="start-btn" id="startBtn">
+          ابدأ المحاكاة الذكية 
+        </button>
+
+      </form>
+    </div>
+
+
+    <div class="loading-screen" id="loadingScreen" aria-live="polite">
+      <div class="loading-spinner">
+        <div class="spinner-ring spinner-outer"></div>
+        <div class="spinner-ring spinner-inner"></div>
+      </div>
+      <p class="loading-text" id="loadingText">
+        جاري قراءة وتحليل البيانات المالية...
+      </p>
+    </div>
+
+  </main>
+
+  <script src="script.js"></script>
+  <script src="inputs.js"></script>
+</body>
+</html>
