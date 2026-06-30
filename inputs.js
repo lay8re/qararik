@@ -1,6 +1,5 @@
 
-let selectedType = null;  
-let profitRate   = null;  
+let selectedType = null;
 
 
 function selectType(type) {
@@ -16,7 +15,7 @@ function selectType(type) {
   if (type === 'personal') {
     updateSliderConfig(1, 5, 1, 3, ['1','2','3','4','5']);
   } else {
-    updateSliderConfig(1, 30, 1, 15, ['1','5','10','15','20','25','30']);
+    updateSliderConfig(1, 30, 1, 15, ['1','10','20','30']);
   }
 }
 
