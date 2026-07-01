@@ -235,9 +235,28 @@ function updateDashboard() {
 
 
   updateAdvisor(key, color);
+fetch("/analyze", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    salary: salary,
+    loan_amount: loanAmount,
+    years: duration,
+    current_obligations: obligations
+  })
+})
+.then(res => res.json())
+.then(data => {
+  console.log(data);
+  document.getElementById("advisorText").textContent = data.recommendation;
+})
+.catch(err => console.log("Backend error:", err));
 }
 
 
 updateSidebarSlider(init.type);
 updateDashboard();
 
+
+
+ 
