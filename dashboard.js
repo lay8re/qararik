@@ -90,24 +90,19 @@ function animateNeedle(targetAngle) {
 }
 
 
-const AI_MESSAGES = {
-  green:  'وضوحك المالي في أمان! 🟢 نسبتك المئوية في حدود الأمان الرسمية، والفائض المتبقي في جيبك ممتاز لإدارة حياتك براحة تامة.',
-  orange: 'دخلت منطقة الضغط المالي المقبول نظاماً. ⚠️ الأقساط تأخذ مساحة من راتبك، لكن ميزانيتك قادرة على الصمود لوجود فائض نقدي جيد في جيبك.',
-  red:    'يا ليت تعيد النظر فوراً! النسبة هنا تجاوزت الحد الأعلى المسموح به من البنك المركزي (45%). 🚨 القرار مرفوض نظاماً وسيقوم البنك برفض المعاملة لحمايتك من التعثر.'
-};
-
-
-function updateAdvisor(zoneKey, color) {
-  const panel  = document.getElementById('advisorPanel');
-  const dot    = document.getElementById('advisorDot');
-  const textEl = document.getElementById('advisorText');
+function updateAdvisor(color) {
+  const panel = document.getElementById('advisorPanel');
+  const dot   = document.getElementById('advisorDot');
 
   dot.style.background         = color;
   panel.style.borderRightColor = color;
+}
 
+function setAdvisorText(text) {
+  const textEl = document.getElementById('advisorText');
   textEl.style.opacity = '0';
   setTimeout(() => {
-    textEl.textContent   = AI_MESSAGES[zoneKey];
+    textEl.textContent   = text;
     textEl.style.opacity = '1';
   }, 220);
 }
@@ -166,6 +161,8 @@ function updateChart(monthly, obligations, salary) {
 function fmtNum(n) { return n.toLocaleString('ar-SA'); }
 
 
+let advisorRequestId = 0;
+
 function updateSidebarSlider(type) {
   const slider = document.getElementById('dashDuration');
   const ticks  = document.getElementById('sbTicks');
@@ -208,7 +205,7 @@ function updateDashboard() {
   const rate                     = calcProfitRate(type, salary, loanAmount, duration);
   const { monthly, totalProfit } = calcPayment(loanAmount, rate, duration);
   const dti                      = calcDTI(monthly, obligations, salary);
-  const { key, color, label }    = getZone(dti);
+  const { color, label }         = getZone(dti);
 
 
   animateNeedle(-90 + (Math.min(dti, 100) / 100) * 180);
@@ -234,23 +231,34 @@ function updateDashboard() {
   document.getElementById('sbTotalProfit').textContent = fmtNum(Math.round(totalProfit)) + ' ريال';
 
 
-  updateAdvisor(key, color);
-fetch("/analyze", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    salary: salary,
-    loan_amount: loanAmount,
-    years: duration,
-    current_obligations: obligations
+  updateAdvisor(color);
+  setAdvisorText('جاري تحليل بياناتك...');
+
+  const requestId = ++advisorRequestId;
+
+  fetch("/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      salary: salary,
+      loan_amount: loanAmount,
+      years: duration,
+      current_obligations: obligations
+    })
   })
-})
-.then(res => res.json())
-.then(data => {
-  console.log(data);
-  document.getElementById("advisorText").textContent = data.recommendation;
-})
-.catch(err => console.log("Backend error:", err));
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      if (requestId !== advisorRequestId) return; // stale response, ignore
+      setAdvisorText(data.recommendation);
+    })
+    .catch(err => {
+      if (requestId !== advisorRequestId) return;
+      console.error("Backend error:", err);
+      setAdvisorText('تعذر الاتصال بالمستشار الذكي. تأكد من تشغيل الخادم (Flask) وأنك تفتح الصفحة عبر الرابط الذي يوفره (مثل http://127.0.0.1:5000)، وليس بفتح الملف مباشرة.');
+    });
 }
 
 
