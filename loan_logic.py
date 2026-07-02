@@ -6,16 +6,16 @@ def analyze_loan(salary, loan_amount, years, current_obligations):
 
     if debt_ratio <= 33:
         risk_level = "آمن"
-        recommendation = f"وضعك المالي آمن. نسبة الالتزامات {round(debt_ratio, 1)}%، وسيبقى لديك {round(remaining_income)} ريال بعد الالتزامات"
+        recommendation = f"وضعك المالي آمن. نسبة الالتزامات {debt_ratio:.1f}% ويبقى لديك {remaining_income:.0f} ريال بعد السداد."
     elif debt_ratio <= 45:
         risk_level = "متوسط"
-        recommendation = f"الخطة ممكنة لكن تحتاج حذر. نسبة الالتزامات {round(debt_ratio, 1)}%، حاول تترك هامش للطوارئ"
+        recommendation = f"الخيار ممكن، لكن يحتاج حذر. نسبة الالتزامات {debt_ratio:.1f}% ويبقى لديك {remaining_income:.0f} ريال، حاول تقليل مبلغ القرض أو زيادة مدة السداد."
     else:
         risk_level = "خطر"
-        recommendation = f"لا ننصح بهذا الخيار. نسبة الالتزامات {round(debt_ratio, 1)}% وقد تسبب ضغط مالي عالي"
+        recommendation = f"لا ننصح بهذا الخيار. نسبة الالتزامات {debt_ratio:.1f}% وقد تسبب ضغط مالي عالي، الأفضل تقليل مبلغ القرض أو زيادة الراتب/مدة السداد."
 
     if remaining_income < salary * 0.2:
-        recommendation += " الدخل المتبقي منخفض، يفضل تقليل مبلغ القرض أو زيادة مدة السداد"
+        recommendation += " كما أن الدخل المتبقي منخفض، لذلك يُفضل ترك هامش للطوارئ."
 
     return {
         "monthly_installment": round(monthly_installment, 2),
