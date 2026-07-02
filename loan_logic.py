@@ -1,8 +1,12 @@
-def analyze_loan(salary, loan_amount, years, current_obligations):
+def analyze_loan(salary, loan_amount, years, current_obligations, debt_ratio=None, remaining_income=None):
     monthly_installment = loan_amount / (years * 12)
     total_obligations = current_obligations + monthly_installment
-    debt_ratio = (total_obligations / salary) * 100
-    remaining_income = salary - total_obligations
+
+    if debt_ratio is None or debt_ratio == 0:
+        debt_ratio = (total_obligations / salary) * 100
+
+    if remaining_income is None or remaining_income == 0:
+        remaining_income = salary - total_obligations
 
     if debt_ratio <= 33:
         risk_level = "آمن"
