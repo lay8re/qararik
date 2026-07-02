@@ -16,11 +16,13 @@ def analyze():
     data = request.get_json()
 
     result = analyze_loan(
-        salary=float(data["salary"]),
-        loan_amount=float(data["loan_amount"]),
-        years=int(data["years"]),
-        current_obligations=float(data["current_obligations"])
-    )
+    salary=float(data["salary"]),
+    loan_amount=float(data["loan_amount"]),
+    years=int(data["years"]),
+    current_obligations=float(data["current_obligations"]),
+    debt_ratio=float(data.get("debt_ratio", 0)),
+    remaining_income=float(data.get("remaining_income", 0))
+)
 
     return jsonify(result)
 
