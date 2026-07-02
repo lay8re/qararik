@@ -55,6 +55,18 @@ function refreshSliderUI() {
 slider.addEventListener('input', refreshSliderUI);
 refreshSliderUI();
 
+/* ================================================================
+   مدة التمويل المتاحة حسب سن التقاعد
+================================================================ */
+function calcYearsUntilRetirement(ApplicantAge, ExpectedRetirementAge) {
+  return ExpectedRetirementAge - ApplicantAge;
+}
+
+function calcMaximumAvailableDuration(type, YearsUntilRetirement) {
+  const typeCap = type === 'personal' ? 5 : 30;
+  return Math.max(0, Math.min(YearsUntilRetirement, typeCap));
+}
+
 // error message
 function showError(id)      { document.getElementById(id).style.display = 'flex'; }
 function hideError(id)      { document.getElementById(id).style.display = 'none'; }
@@ -70,6 +82,14 @@ document.getElementById('loanAmount').addEventListener('input', function () {
 });
 document.getElementById('obligations').addEventListener('input', function () {
   if (this.value !== '') { hideError('obligationsError'); markValid('obligations'); }
+});
+document.getElementById('applicantAge').addEventListener('input', function () {
+  if (+this.value > 0) { hideError('applicantAgeError'); markValid('applicantAge'); }
+});
+document.getElementById('expectedRetirementAge').addEventListener('input', function () {
+  hideError('expectedRetirementAgeError');
+  hideError('retirementEligibilityError');
+  markValid('expectedRetirementAge');
 });
 
 
@@ -106,6 +126,42 @@ function validateForm() {
     hideError('obligationsError'); markValid('obligations');
   }
 
+  hideError('expectedRetirementAgeError');
+  hideError('retirementEligibilityError');
+  hideError('durationError');
+
+  const ApplicantAge = +document.getElementById('applicantAge').value;
+  if (!ApplicantAge || ApplicantAge <= 0) {
+    showError('applicantAgeError'); markInvalid('applicantAge'); valid = false;
+  } else {
+    hideError('applicantAgeError'); markValid('applicantAge');
+  }
+
+  const ExpectedRetirementAge = +document.getElementById('expectedRetirementAge').value;
+  if (!ExpectedRetirementAge || ExpectedRetirementAge <= 0) {
+    showError('expectedRetirementAgeError'); markInvalid('expectedRetirementAge'); valid = false;
+  } else if (ApplicantAge > 0 && ExpectedRetirementAge <= ApplicantAge) {
+    showError('expectedRetirementAgeError'); markInvalid('expectedRetirementAge'); valid = false;
+  } else if (ApplicantAge > 0) {
+    markValid('expectedRetirementAge');
+
+    const YearsUntilRetirement = calcYearsUntilRetirement(ApplicantAge, ExpectedRetirementAge);
+
+    if (YearsUntilRetirement < 1) {
+      showError('retirementEligibilityError'); valid = false;
+    } else if (selectedType) {
+      const MaximumAvailableDuration = calcMaximumAvailableDuration(selectedType, YearsUntilRetirement);
+      const chosenDuration = +document.getElementById('durationSlider').value;
+
+      if (chosenDuration > MaximumAvailableDuration) {
+        document.getElementById('durationError').textContent =
+          `⚠ الحد الأقصى لمدة التمويل بناءً على عمرك هو ${MaximumAvailableDuration} ${MaximumAvailableDuration === 1 ? 'سنة' : 'سنوات'}. الرجاء تعديل مدة التمويل.`;
+        showError('durationError');
+        valid = false;
+      }
+    }
+  }
+
   return valid;
 }
 
@@ -120,11 +176,13 @@ document.getElementById('startBtn').addEventListener('click', function () {
   if (!validateForm()) return;
 
   localStorage.setItem('qararikData', JSON.stringify({
-    type:        selectedType,
-    salary:      +document.getElementById('salary').value,
-    loanAmount:  +document.getElementById('loanAmount').value,
-    duration:    +document.getElementById('durationSlider').value,
-    obligations: +document.getElementById('obligations').value
+    type:                  selectedType,
+    salary:                +document.getElementById('salary').value,
+    loanAmount:             +document.getElementById('loanAmount').value,
+    duration:               +document.getElementById('durationSlider').value,
+    obligations:            +document.getElementById('obligations').value,
+    applicantAge:           +document.getElementById('applicantAge').value,
+    expectedRetirementAge:  +document.getElementById('expectedRetirementAge').value
   }));
 
   this.disabled = true;

@@ -1,6 +1,9 @@
 
 const saved    = JSON.parse(localStorage.getItem('qararikData') || '{}');
-const DEFAULTS = { type: 'personal', salary: 10000, loanAmount: 50000, duration: 3, obligations: 0 };
+const DEFAULTS = {
+  type: 'personal', salary: 10000, loanAmount: 50000, duration: 3, obligations: 0,
+  applicantAge: 30, expectedRetirementAge: 60
+};
 const init     = { ...DEFAULTS, ...saved };
 
 
@@ -70,6 +73,23 @@ function getZone(dti) {
   if (dti <= 45) return { key: 'orange', color: '#f97316', label: 'ضغط مالي مقبول'                 };
   return               { key: 'red',    color: '#ef4444', label: 'منطقة خطر (تجاوز الحد النظامي)' };
 }
+
+/* ================================================================
+   ⑦B مدة التمويل المتاحة حسب سن التقاعد
+      YearsUntilRetirement     = ExpectedRetirementAge - ApplicantAge
+      MaximumAvailableDuration = الأصغر بين (YearsUntilRetirement، الحد الأقصى لنوع التمويل)
+================================================================ */
+function calcYearsUntilRetirement(ApplicantAge, ExpectedRetirementAge) {
+  return ExpectedRetirementAge - ApplicantAge;
+}
+
+function calcMaximumAvailableDuration(type, YearsUntilRetirement) {
+  const typeCap = type === 'personal' ? 5 : 30;
+  return Math.max(0, Math.min(YearsUntilRetirement, typeCap));
+}
+
+function fmtYears(n) { return n + (n === 1 ? ' سنة' : ' سنوات'); }
+
 
 function animateNeedle(targetAngle) {
   if (animId) cancelAnimationFrame(animId);
@@ -201,6 +221,48 @@ function updateDashboard() {
   const obligations = +document.getElementById('dashObligations').value || 0;
 
   if (salary <= 0 || loanAmount <= 0) return;
+
+  const ApplicantAge          = +init.applicantAge;
+  const ExpectedRetirementAge = +init.expectedRetirementAge;
+  const YearsUntilRetirement     = calcYearsUntilRetirement(ApplicantAge, ExpectedRetirementAge);
+  const MaximumAvailableDuration = calcMaximumAvailableDuration(type, YearsUntilRetirement);
+
+  document.getElementById('maxDurationVal').textContent = fmtYears(MaximumAvailableDuration);
+
+  const retirementWarningEl  = document.getElementById('retirementWarning');
+  const retirementUnsuitable = YearsUntilRetirement < 1 || duration > MaximumAvailableDuration;
+
+  if (YearsUntilRetirement < 1) {
+    retirementWarningEl.textContent   = 'غير مؤهل للتمويل، لعدم توفر مدة تمويل كافية قبل سن التقاعد';
+    retirementWarningEl.style.display = 'block';
+  } else if (duration > MaximumAvailableDuration) {
+    retirementWarningEl.textContent =
+      `مدة التمويل الحالية (${fmtYears(duration)}) تتجاوز الحد الأقصى المسموح به (${fmtYears(MaximumAvailableDuration)}) بناءً على عمرك المتوقع للتقاعد. الرجاء تعديل مدة التمويل.`;
+    retirementWarningEl.style.display = 'block';
+  } else {
+    retirementWarningEl.style.display = 'none';
+  }
+
+  if (retirementUnsuitable) {
+    const dtiEl  = document.getElementById('gaugeDTI');
+    const zoneEl = document.getElementById('gaugeZone');
+    dtiEl.textContent  = '—';
+    dtiEl.style.color  = '#ef4444';
+    zoneEl.textContent = 'غير مناسب (تجاوز سن التقاعد)';
+    zoneEl.style.color = '#ef4444';
+
+    document.getElementById('gaugeMonthly').textContent = '—';
+    document.getElementById('gaugeRate').textContent    = '—';
+    document.getElementById('sbMonthly').textContent     = '—';
+    document.getElementById('sbRate').textContent        = '—';
+    document.getElementById('sbTotalProfit').textContent = '—';
+
+    animateNeedle(90);
+    updateAdvisor('#ef4444');
+    advisorRequestId++; // إبطال أي رد سابق من Flask قيد التحميل
+    setAdvisorText('لا يمكن إتمام الحساب : مدة التمويل الحالية تتجاوز الحد المتاح قبل سن التقاعد. الرجاء تعديل مدة التمويل');
+    return;
+  }
 
   const rate                     = calcProfitRate(type, salary, loanAmount, duration);
   const { monthly, totalProfit } = calcPayment(loanAmount, rate, duration);

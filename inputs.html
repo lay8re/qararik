@@ -84,6 +84,33 @@
 
 
         <div class="field-group">
+          <label class="field-label" for="applicantAge">
+            <span class="field-icon">👤</span>
+            عمر العميل
+          </label>
+          <input id="applicantAge" type="number" class="field-input" min="18" max="100"
+                 placeholder="أدخل عمرك الحالي" />
+          <span class="field-error" id="applicantAgeError">
+            ⚠ الرجاء إدخال عمر العميل
+          </span>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="expectedRetirementAge">
+            <span class="field-icon">⏳</span>
+            العمر المتوقع للتقاعد
+          </label>
+          <input id="expectedRetirementAge" type="number" class="field-input" min="19" max="100"
+                 placeholder="أدخل العمر المتوقع للتقاعد" />
+          <span class="field-error" id="expectedRetirementAgeError">
+            ⚠ يجب أن يكون العمر المتوقع للتقاعد أكبر من عمر العميل
+          </span>
+          <span class="field-error" id="retirementEligibilityError">
+            ⚠ غير مؤهل للتمويل، لعدم توفر مدة تمويل كافية قبل سن التقاعد.
+          </span>
+        </div>
+
+        <div class="field-group">
           <label class="field-label">مدة السداد</label>
           <div class="slider-wrapper">
             <div class="slider-display">
@@ -96,6 +123,9 @@
               <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
             </div>
           </div>
+          <span class="field-error" id="durationError">
+            ⚠ مدة التمويل تتجاوز الحد الأقصى المسموح به حسب عمرك
+          </span>
         </div>
 
 
