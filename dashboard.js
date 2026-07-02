@@ -178,7 +178,7 @@ function updateChart(monthly, obligations, salary) {
 }
 
 
-function fmtNum(n) { return n.toLocaleString('ar-SA'); }
+function fmtNum(n) { return n.toLocaleString('en-US'); }
 
 
 let advisorRequestId = 0;
@@ -302,11 +302,13 @@ function updateDashboard() {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      salary: salary,
-      loan_amount: loanAmount,
-      years: duration,
-      current_obligations: obligations
-    })
+  salary: salary,
+  loan_amount: loanAmount,
+  years: duration,
+  current_obligations: obligations,
+  debt_ratio: dti,
+  remaining_income: salary - obligations - monthly
+})
   })
     .then(res => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -314,7 +316,20 @@ function updateDashboard() {
     })
     .then(data => {
       if (requestId !== advisorRequestId) return; // stale response, ignore
-      setAdvisorText(data.recommendation);
+      const shownDti = Math.round(dti);
+const shownRemaining = Math.round(salary - obligations - monthly);
+
+let advisorMsg = "";
+
+if (shownDti <= 33) {
+  advisorMsg = `وضعك المالي آمن. نسبة الالتزامات ${shownDti}% ويبقى لديك ${shownRemaining} ريال بعد السداد.`;
+} else if (shownDti <= 45) {
+  advisorMsg = `الخيار ممكن لكن يحتاج حذر. نسبة الالتزامات ${shownDti}% ويبقى لديك ${shownRemaining} ريال بعد السداد.`;
+} else {
+  advisorMsg = `لا ننصح بهذا الخيار. نسبة الالتزامات ${shownDti}% وقد تسبب ضغط مالي عالي، الأفضل تقليل مبلغ القرض أو زيادة مدة السداد.`;
+}
+
+setAdvisorText(advisorMsg);
     })
     .catch(err => {
       if (requestId !== advisorRequestId) return;
