@@ -29,3 +29,13 @@ body {
   overflow-x: hidden;
   position: relative;
 }
+
+#gaugeDTI,
+#gaugeMonthly,
+#chartRemaining,
+#sbMonthly,
+#sbRate,
+#sbTotalProfit {
+  font-family: Arial, sans-serif !important;
+  font-variant-numeric: lining-nums !important;
+}
