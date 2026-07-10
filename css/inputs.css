@@ -69,6 +69,11 @@
 .field-icon {
   font-size: 1rem;
   line-height: 1;
+  color: var(--primary-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1em;
 }
 
 .field-input {
@@ -310,6 +315,7 @@
 .type-icon {
   font-size: 1.7rem;
   line-height: 1;
+  color: var(--primary-color);
 }
 
 .type-name {
@@ -339,4 +345,11 @@
   border-color: #fca5a5;
   background: #fff8f8;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
+}
+
+.field-hint {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin-top: 2px;
 }

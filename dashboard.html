@@ -52,7 +52,25 @@
           <div class="sb-field">
             <label class="sb-label">مبلغ التمويل (ريال)</label>
             <input id="dashLoan" type="number" class="sb-input"
-                   min="1" placeholder="0" oninput="updateDashboard()" /> 
+                   min="1" placeholder="0" oninput="updateDashboard()" />
+          </div>
+
+          <div class="sb-field">
+            <label class="sb-label">عمر العميل</label>
+            <input id="dashApplicantAge" type="number" class="sb-input"
+                   min="18" max="100" placeholder="0" oninput="updateDashboard()" />
+          </div>
+
+          <div class="sb-field">
+            <label class="sb-label">العمر المتوقع للتقاعد</label>
+            <input id="dashExpectedRetirementAge" type="number" class="sb-input"
+                   min="19" max="100" placeholder="0" oninput="updateDashboard()" />
+          </div>
+
+          <div class="sb-field">
+            <label class="sb-label">الراتب المتوقع بعد التقاعد (ريال)</label>
+            <input id="dashPostRetirementSalary" type="number" class="sb-input"
+                   min="0" placeholder="اختياري" oninput="updateDashboard()" />
           </div>
 
           <div class="sb-field">
@@ -90,6 +108,10 @@
             <div class="sb-stat">
               <span class="sb-stat-lbl">إجمالي الأرباح</span>
               <span class="sb-stat-val" id="sbTotalProfit">—</span>
+            </div>
+            <div class="sb-stat">
+              <span class="sb-stat-lbl">الرسوم الإدارية</span>
+              <span class="sb-stat-val" id="sbAdminFee">—</span>
             </div>
           </div>
 
@@ -180,6 +202,12 @@
 
       </div>
 
+    <!-- تحليل ما بعد التقاعد -->
+      <div class="dash-card retirement-note" id="retirementNote" style="display:none;">
+        <p class="card-label" id="retirementNoteTitle">⚠️ تحليل ما بعد التقاعد</p>
+        <p class="retirement-note-text" id="retirementNoteText"></p>
+      </div>
+
     <!--  AI  -->
       <div class="dash-card advisor-panel" id="advisorPanel">
         <div class="advisor-head">
@@ -190,18 +218,6 @@
         <p class="advisor-text" id="advisorText">
           أدخل البيانات في الشريط الجانبي لتظهر لك توصيات المستشار الذكي...
         </p>
-      </div>
-
-      <!-- مدة التمويل حسب سن التقاعد -->
-      <div class="dash-card retirement-card" id="retirementCard">
-        <p class="card-label">مدة التمويل المتاحة حسب العمر</p>
-        <div class="gauge-nums">
-          <div class="gauge-num">
-            <span class="gn-lbl">الحد الأقصى لمدة التمويل</span>
-            <span class="gn-val" id="maxDurationVal">—</span>
-          </div>
-        </div>
-        <p class="advisor-text" id="retirementWarning" style="display:none; color:#ef4444; margin-top:12px;"></p>
       </div>
 
     </main>

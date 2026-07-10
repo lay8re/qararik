@@ -1,6 +1,6 @@
-/* ================================================
-   Dashboard — Tablet (≤ 1024px)
-================================================ */
+/* 
+   Dashboard — Tablet 
+ */
 @media (max-width: 1024px) {
   .dashboard-layout {
     grid-template-columns: 1fr;
@@ -20,10 +20,9 @@
   }
 }
 
-/* ================================================
-   Dashboard — Mobile (≤ 768px)
-   النتائج أولاً، الشريط الجانبي في الأسفل
-================================================ */
+/*
+   Dashboard — Mobile 
+   */
 @media (max-width: 768px) {
 
   .dashboard-layout {
@@ -32,23 +31,23 @@
     gap: 14px;
   }
 
-  /* النتائج تظهر أول، والتحكم في الأسفل */
+
   .dash-main    { order: 1; }
   .dash-sidebar { order: 2; position: static; }
 
-  /* الكروت العلوية تحت بعض */
+
   .dash-top-row {
     grid-template-columns: 1fr;
     gap: 14px;
   }
 
-  /* العداد — يأخذ العرض الكامل */
+ 
   .gauge-wrap {
     max-width: 260px;
     margin: 0 auto;
   }
 
-  /* حقول الإدخال — أكبر للمس باليد */
+ 
   .sb-input,
   .sb-select {
     padding: 13px 14px;
@@ -56,7 +55,7 @@
     min-height: 48px;
   }
 
-  /* Slider thumb — أكبر للمس */
+ 
   .sb-slider::-webkit-slider-thumb {
     width: 26px;
     height: 26px;
@@ -66,7 +65,7 @@
     height: 26px;
   }
 
-  /* مقاسات النصوص */
+
   .sidebar-title    { font-size: 1rem;    }
   .sidebar-subtitle { font-size: 0.78rem; }
   .gauge-dti        { font-size: 1.7rem;  }
@@ -74,18 +73,18 @@
   .advisor-text     { font-size: 0.88rem; line-height: 1.7; }
   .card-label       { font-size: 0.8rem;  }
 
-  /* أسطورة العداد — مضغوطة */
+
   .gauge-legend { gap: 6px; }
   .g-zone       { font-size: 0.68rem; padding: 3px 8px; }
 
-  /* المخطط */
+
   .chart-wrap        { min-height: 200px; }
   .chart-wrap canvas { max-height: 210px; }
 }
 
-/* ================================================
-   Dashboard — Small Mobile (≤ 480px)
-================================================ */
+/* 
+   Dashboard — Small Mobile 
+ */
 @media (max-width: 480px) {
 
   .dashboard-layout {

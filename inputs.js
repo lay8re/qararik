@@ -55,18 +55,6 @@ function refreshSliderUI() {
 slider.addEventListener('input', refreshSliderUI);
 refreshSliderUI();
 
-/* ================================================================
-   مدة التمويل المتاحة حسب سن التقاعد
-================================================================ */
-function calcYearsUntilRetirement(ApplicantAge, ExpectedRetirementAge) {
-  return ExpectedRetirementAge - ApplicantAge;
-}
-
-function calcMaximumAvailableDuration(type, YearsUntilRetirement) {
-  const typeCap = type === 'personal' ? 5 : 30;
-  return Math.max(0, Math.min(YearsUntilRetirement, typeCap));
-}
-
 // error message
 function showError(id)      { document.getElementById(id).style.display = 'flex'; }
 function hideError(id)      { document.getElementById(id).style.display = 'none'; }
@@ -88,7 +76,6 @@ document.getElementById('applicantAge').addEventListener('input', function () {
 });
 document.getElementById('expectedRetirementAge').addEventListener('input', function () {
   hideError('expectedRetirementAgeError');
-  hideError('retirementEligibilityError');
   markValid('expectedRetirementAge');
 });
 
@@ -107,6 +94,10 @@ function validateForm() {
 
   const salary = +document.getElementById('salary').value;
   if (!salary || salary <= 0) {
+    document.getElementById('salaryError').textContent = '⚠ الرجاء إدخال الراتب الشهري';
+    showError('salaryError'); markInvalid('salary'); valid = false;
+  } else if (salary < 3000) {
+    document.getElementById('salaryError').textContent = '⚠ الحد الأدنى لصافي الراتب يبدأ من 3000 ريال';
     showError('salaryError'); markInvalid('salary'); valid = false;
   } else {
     hideError('salaryError'); markValid('salary');
@@ -127,11 +118,13 @@ function validateForm() {
   }
 
   hideError('expectedRetirementAgeError');
-  hideError('retirementEligibilityError');
-  hideError('durationError');
 
   const ApplicantAge = +document.getElementById('applicantAge').value;
   if (!ApplicantAge || ApplicantAge <= 0) {
+    document.getElementById('applicantAgeError').textContent = '⚠ الرجاء إدخال عمر العميل';
+    showError('applicantAgeError'); markInvalid('applicantAge'); valid = false;
+  } else if (ApplicantAge < 18) {
+    document.getElementById('applicantAgeError').textContent = '⚠ الحد الأدنى للعمر المسموح به للتمويل هو 18 سنة';
     showError('applicantAgeError'); markInvalid('applicantAge'); valid = false;
   } else {
     hideError('applicantAgeError'); markValid('applicantAge');
@@ -142,24 +135,8 @@ function validateForm() {
     showError('expectedRetirementAgeError'); markInvalid('expectedRetirementAge'); valid = false;
   } else if (ApplicantAge > 0 && ExpectedRetirementAge <= ApplicantAge) {
     showError('expectedRetirementAgeError'); markInvalid('expectedRetirementAge'); valid = false;
-  } else if (ApplicantAge > 0) {
+  } else {
     markValid('expectedRetirementAge');
-
-    const YearsUntilRetirement = calcYearsUntilRetirement(ApplicantAge, ExpectedRetirementAge);
-
-    if (YearsUntilRetirement < 1) {
-      showError('retirementEligibilityError'); valid = false;
-    } else if (selectedType) {
-      const MaximumAvailableDuration = calcMaximumAvailableDuration(selectedType, YearsUntilRetirement);
-      const chosenDuration = +document.getElementById('durationSlider').value;
-
-      if (chosenDuration > MaximumAvailableDuration) {
-        document.getElementById('durationError').textContent =
-          `⚠ الحد الأقصى لمدة التمويل بناءً على عمرك هو ${MaximumAvailableDuration} ${MaximumAvailableDuration === 1 ? 'سنة' : 'سنوات'}. الرجاء تعديل مدة التمويل.`;
-        showError('durationError');
-        valid = false;
-      }
-    }
   }
 
   return valid;
@@ -182,7 +159,8 @@ document.getElementById('startBtn').addEventListener('click', function () {
     duration:               +document.getElementById('durationSlider').value,
     obligations:            +document.getElementById('obligations').value,
     applicantAge:           +document.getElementById('applicantAge').value,
-    expectedRetirementAge:  +document.getElementById('expectedRetirementAge').value
+    expectedRetirementAge:  +document.getElementById('expectedRetirementAge').value,
+    postRetirementSalary:   +document.getElementById('postRetirementSalary').value || 0
   }));
 
   this.disabled = true;

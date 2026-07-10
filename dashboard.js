@@ -2,7 +2,7 @@
 const saved    = JSON.parse(localStorage.getItem('qararikData') || '{}');
 const DEFAULTS = {
   type: 'personal', salary: 10000, loanAmount: 50000, duration: 3, obligations: 0,
-  applicantAge: 30, expectedRetirementAge: 60
+  applicantAge: 30, expectedRetirementAge: 60, postRetirementSalary: 0
 };
 const init     = { ...DEFAULTS, ...saved };
 
@@ -10,19 +10,23 @@ const init     = { ...DEFAULTS, ...saved };
 document.getElementById('dashType').value        = init.type;
 document.getElementById('dashSalary').value      = init.salary;
 document.getElementById('dashLoan').value        = init.loanAmount;
+document.getElementById('dashDuration').max      = init.type === 'personal' ? 5 : 30;
 document.getElementById('dashDuration').value    = init.duration;
 document.getElementById('dashObligations').value = init.obligations;
+document.getElementById('dashApplicantAge').value          = init.applicantAge;
+document.getElementById('dashExpectedRetirementAge').value = init.expectedRetirementAge;
+document.getElementById('dashPostRetirementSalary').value   = init.postRetirementSalary || '';
 
 
 let needleAngle = -90;
 let animId      = null;
 
-/* ================================================================
-   ④ حساب نسبة الربح (Risk-Based Pricing)
+/* 
+      حساب نسبة الربح 
       شخصي : تبدأ 3.0% + 0.2% لكل سنة إضافية
       عقاري: تبدأ 4.0% + 0.1% لكل سنة إضافية
-              + 0.5% إذا القرض > 25 ضعف الراتب الشهري
-================================================================ */
+      + 0.5% إذا القرض > 25 ضعف الراتب الشهري
+*/
 function calcProfitRate(type, salary, loanAmount, years) {
   if (type === 'personal') {
     return 3.0 + (years - 1) * 0.2;
@@ -33,12 +37,12 @@ function calcProfitRate(type, salary, loanAmount, years) {
   }
 }
 
-/* ================================================================
-   ⑤ حساب القسط بمعادلة الأقساط المتناقصة (Annuity Formula)
+/* 
+     حساب القسط بمعادلة الأقساط المتناقصة (Annuity Formula)
       القسط = P × [r(1+r)^n] / [(1+r)^n - 1]
       r = معدل شهري (نسبة سنوية ÷ 12)
       n = عدد الأشهر (سنوات × 12)
-================================================================ */
+ */
 function calcPayment(loanAmount, annualRate, years) {
   const n = years * 12;
   const r = (annualRate / 100) / 12;
@@ -53,42 +57,102 @@ function calcPayment(loanAmount, annualRate, years) {
   return { monthly, totalProfit };
 }
 
-/* ================================================================
-   ⑥ حساب نسبة الاستقطاع الكلية DTI (Debt-To-Income)
+/* 
+     حساب نسبة الاستقطاع الكلية DTI (Debt-To-Income)
       DTI = ((القسط الجديد + الالتزامات الشهرية) ÷ الراتب) × 100
-================================================================ */
+*/
 function calcDTI(monthly, obligations, salary) {
   if (salary <= 0) return 0;
   return ((monthly + obligations) / salary) * 100;
 }
 
-/* ================================================================
-   ⑦ تحديد المنطقة بناءً على معايير ساما الرسمية (DTI)
+/* 
+     تحديد المنطقة بناءً على معايير ساما  (DTI)
       ≤ 33%        → أمان مالي
       34% – 45%    → ضغط مالي مقبول
       > 45%        → منطقة خطر (تجاوز الحد النظامي)
-================================================================ */
+*/
 function getZone(dti) {
   if (dti <= 33) return { key: 'green',  color: '#22c55e', label: 'أمان مالي'                      };
   if (dti <= 45) return { key: 'orange', color: '#f97316', label: 'ضغط مالي مقبول'                 };
   return               { key: 'red',    color: '#ef4444', label: 'منطقة خطر (تجاوز الحد النظامي)' };
 }
 
-/* ================================================================
-   ⑦B مدة التمويل المتاحة حسب سن التقاعد
-      YearsUntilRetirement     = ExpectedRetirementAge - ApplicantAge
-      MaximumAvailableDuration = الأصغر بين (YearsUntilRetirement، الحد الأقصى لنوع التمويل)
-================================================================ */
-function calcYearsUntilRetirement(ApplicantAge, ExpectedRetirementAge) {
-  return ExpectedRetirementAge - ApplicantAge;
+/* 
+     شروط الأهلية الرسمية
+      - العمر أقل من 18 سنة → إيقاف جميع العمليات الحسابية
+      - الراتب الشهري أقل من 3000 ريال → إيقاف جميع العمليات الحسابية
+*/
+const MIN_AGE    = 18;
+const MIN_SALARY = 3000;
+
+function checkEligibility(applicantAge, salary) {
+  if (applicantAge < MIN_AGE) {
+    return `الحد الأدنى للعمر المسموح به للتمويل هو ${MIN_AGE} سنة.`;
+  }
+  if (salary < MIN_SALARY) {
+    return `الحد الأدنى لصافي الراتب الشهري يبدأ من ${MIN_SALARY} ريال.`;
+  }
+  return null;
 }
 
-function calcMaximumAvailableDuration(type, YearsUntilRetirement) {
-  const typeCap = type === 'personal' ? 5 : 30;
-  return Math.max(0, Math.min(YearsUntilRetirement, typeCap));
+/* 
+    الرسوم الإدارية
+*/
+function calcAdministrativeFee(loanAmount) {
+  return Math.min(loanAmount * 0.005, 2500);
 }
 
-function fmtYears(n) { return n + (n === 1 ? ' سنة' : ' سنوات'); }
+/* 
+      تحليل ما بعد التقاعد
+      العمر عند نهاية التمويل = العمر الحالي + مدة السداد 
+      إذا تجاوز العمر عند نهاية التمويل سن التقاعد المتوقع، يمتد التمويل
+      إلى ما بعد التقاعد ويُفعَّل تحليل إضافي دون رفض التمويل
+*/
+function analyzePostRetirement(applicantAge, expectedRetirementAge, duration, monthly, postRetirementSalary) {
+  const ageAtLoanEnd = applicantAge + duration;
+  const extendsBeyondRetirement = ageAtLoanEnd > expectedRetirementAge;
+
+  if (!extendsBeyondRetirement) {
+    return { extendsBeyondRetirement: false, incomplete: false, postRetirementDTI: null };
+  }
+
+  if (!postRetirementSalary || postRetirementSalary <= 0) {
+    return { extendsBeyondRetirement: true, incomplete: true, postRetirementDTI: null };
+  }
+
+  const postRetirementDTI = (monthly / postRetirementSalary) * 100;
+  return { extendsBeyondRetirement: true, incomplete: false, postRetirementDTI };
+}
+
+/* 
+      صندوق "تحليل ما بعد التقاعد" (معلومة إضافية منفصلة فقط)
+      لا يغيّر أي مؤشر أساسي في الصفحة 
+      - لا يمتد التمويل بعد التقاعد        → الصندوق مخفي بالكامل
+      - يمتد ولا يوجد راتب متوقع بعد التقاعد → تنبيه بسيط فقط
+      - يمتد ويوجد راتب متوقع بعد التقاعد    → صندوق بنسبة الاستقطاع المتوقعة فقط
+*/
+function updateRetirementNote(retirementAnalysis) {
+  const box   = document.getElementById('retirementNote');
+  const title = document.getElementById('retirementNoteTitle');
+  const text  = document.getElementById('retirementNoteText');
+
+  if (!retirementAnalysis.extendsBeyondRetirement) {
+    box.style.display = 'none';
+    return;
+  }
+
+  box.style.display = 'block';
+
+  if (retirementAnalysis.incomplete) {
+    title.style.display = 'none';
+    text.textContent = 'تمتد مدة التمويل إلى ما بعد التقاعد، ولكن لم يتم إدخال الراتب المتوقع بعد التقاعد ، لذلك لا يمكن حساب نسبة الاستقطاع بعد التقاعد.';
+    return;
+  }
+
+  title.style.display = '';
+  text.textContent = `تمتد مدة التمويل إلى ما بعد التقاعد ، وستصبح نسبة الاستقطاع ${Math.round(retirementAnalysis.postRetirementDTI)}% اعتمادًا على الراتب المتوقع بعد التقاعد.`;
+}
 
 
 function animateNeedle(targetAngle) {
@@ -212,8 +276,26 @@ function refreshSbSlider() {
 function onTypeChange()     { updateSidebarSlider(document.getElementById('dashType').value); updateDashboard(); }
 function onDurationChange() { refreshSbSlider(); updateDashboard(); }
 
+/* 
+   حفظ التعديلات الحالية في لوحة التحكم بحيث لا تُفقد عند تحديث الصفحة
+*/
+function persistDashboardState() {
+  localStorage.setItem('qararikData', JSON.stringify({
+    type:                  document.getElementById('dashType').value,
+    salary:                +document.getElementById('dashSalary').value      || 0,
+    loanAmount:            +document.getElementById('dashLoan').value        || 0,
+    duration:              +document.getElementById('dashDuration').value    || 1,
+    obligations:           +document.getElementById('dashObligations').value || 0,
+    applicantAge:          +document.getElementById('dashApplicantAge').value          || 0,
+    expectedRetirementAge: +document.getElementById('dashExpectedRetirementAge').value || 0,
+    postRetirementSalary:  +document.getElementById('dashPostRetirementSalary').value  || 0
+  }));
+}
+
 
 function updateDashboard() {
+  persistDashboardState();
+
   const type        = document.getElementById('dashType').value;
   const salary      = +document.getElementById('dashSalary').value      || 0;
   const loanAmount  = +document.getElementById('dashLoan').value        || 0;
@@ -222,33 +304,18 @@ function updateDashboard() {
 
   if (salary <= 0 || loanAmount <= 0) return;
 
-  const ApplicantAge          = +init.applicantAge;
-  const ExpectedRetirementAge = +init.expectedRetirementAge;
-  const YearsUntilRetirement     = calcYearsUntilRetirement(ApplicantAge, ExpectedRetirementAge);
-  const MaximumAvailableDuration = calcMaximumAvailableDuration(type, YearsUntilRetirement);
+  const ApplicantAge           = +document.getElementById('dashApplicantAge').value          || 0;
+  const ExpectedRetirementAge  = +document.getElementById('dashExpectedRetirementAge').value || 0;
+  const PostRetirementSalary   = +document.getElementById('dashPostRetirementSalary').value  || 0;
 
-  document.getElementById('maxDurationVal').textContent = fmtYears(MaximumAvailableDuration);
+  const eligibilityMessage = checkEligibility(ApplicantAge, salary);
 
-  const retirementWarningEl  = document.getElementById('retirementWarning');
-  const retirementUnsuitable = YearsUntilRetirement < 1 || duration > MaximumAvailableDuration;
-
-  if (YearsUntilRetirement < 1) {
-    retirementWarningEl.textContent   = 'غير مؤهل للتمويل، لعدم توفر مدة تمويل كافية قبل سن التقاعد';
-    retirementWarningEl.style.display = 'block';
-  } else if (duration > MaximumAvailableDuration) {
-    retirementWarningEl.textContent =
-      `مدة التمويل الحالية (${fmtYears(duration)}) تتجاوز الحد الأقصى المسموح به (${fmtYears(MaximumAvailableDuration)}) بناءً على عمرك المتوقع للتقاعد. الرجاء تعديل مدة التمويل.`;
-    retirementWarningEl.style.display = 'block';
-  } else {
-    retirementWarningEl.style.display = 'none';
-  }
-
-  if (retirementUnsuitable) {
+  if (eligibilityMessage) {
     const dtiEl  = document.getElementById('gaugeDTI');
     const zoneEl = document.getElementById('gaugeZone');
     dtiEl.textContent  = '—';
     dtiEl.style.color  = '#ef4444';
-    zoneEl.textContent = 'غير مناسب (تجاوز سن التقاعد)';
+    zoneEl.textContent = 'غير مؤهل';
     zoneEl.style.color = '#ef4444';
 
     document.getElementById('gaugeMonthly').textContent = '—';
@@ -256,18 +323,27 @@ function updateDashboard() {
     document.getElementById('sbMonthly').textContent     = '—';
     document.getElementById('sbRate').textContent        = '—';
     document.getElementById('sbTotalProfit').textContent = '—';
+    document.getElementById('sbAdminFee').textContent    = '—';
 
     animateNeedle(90);
     updateAdvisor('#ef4444');
     advisorRequestId++; // إبطال أي رد سابق من Flask قيد التحميل
-    setAdvisorText('لا يمكن إتمام الحساب : مدة التمويل الحالية تتجاوز الحد المتاح قبل سن التقاعد. الرجاء تعديل مدة التمويل');
+    setAdvisorText(`لا يمكن إتمام الحساب: ${eligibilityMessage}`);
+    document.getElementById('retirementNote').style.display = 'none';
     return;
   }
 
   const rate                     = calcProfitRate(type, salary, loanAmount, duration);
   const { monthly, totalProfit } = calcPayment(loanAmount, rate, duration);
   const dti                      = calcDTI(monthly, obligations, salary);
-  const { color, label }         = getZone(dti);
+  const zone                     = getZone(dti);
+  const { color, label }         = zone;
+
+  const retirementAnalysis = analyzePostRetirement(ApplicantAge, ExpectedRetirementAge, duration, monthly, PostRetirementSalary);
+  updateRetirementNote(retirementAnalysis);
+
+  const adminFee = calcAdministrativeFee(loanAmount);
+  document.getElementById('sbAdminFee').textContent = fmtNum(Math.round(adminFee)) + ' ريال';
 
 
   animateNeedle(-90 + (Math.min(dti, 100) / 100) * 180);
@@ -315,7 +391,7 @@ function updateDashboard() {
       return res.json();
     })
     .then(data => {
-      if (requestId !== advisorRequestId) return; // stale response, ignore
+      if (requestId !== advisorRequestId) return; 
       const shownDti = Math.round(dti);
 const shownRemaining = Math.round(salary - obligations - monthly);
 
@@ -334,7 +410,7 @@ setAdvisorText(advisorMsg);
     .catch(err => {
       if (requestId !== advisorRequestId) return;
       console.error("Backend error:", err);
-      setAdvisorText('تعذر الاتصال بالمستشار الذكي. تأكد من تشغيل الخادم (Flask) وأنك تفتح الصفحة عبر الرابط الذي يوفره (مثل http://127.0.0.1:5000)، وليس بفتح الملف مباشرة.');
+      setAdvisorText('تعذر الاتصال بالمستشار الذكي');
     });
 }
 

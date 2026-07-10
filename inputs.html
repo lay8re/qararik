@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/header.css" />
   <link rel="stylesheet" href="css/inputs.css" />
   <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
 
@@ -39,14 +40,14 @@
 
             <button type="button" class="type-btn" id="btnPersonal"
                     onclick="selectType('personal')">
-              <span class="type-icon">👤</span>
+              <span class="type-icon"><i class="fa-solid fa-user"></i></span>
               <span class="type-name">تمويل شخصي</span>
               <span class="type-hint">حتى 5 سنوات</span>
             </button>
 
             <button type="button" class="type-btn" id="btnRealEstate"
                     onclick="selectType('realEstate')">
-              <span class="type-icon">🏠</span>
+              <span class="type-icon"><i class="fa-solid fa-house"></i></span>
               <span class="type-name">تمويل عقاري</span>
               <span class="type-hint">حتى 30 سنة</span>
             </button>
@@ -59,7 +60,7 @@
 
         <div class="field-group">
           <label class="field-label" for="salary">
-            <span class="field-icon">💵</span>
+            <span class="field-icon"><i class="fa-solid fa-wallet"></i></span>
             الراتب الشهري
           </label>
           <input id="salary" type="number" class="field-input" min="1"
@@ -72,7 +73,7 @@
   
         <div class="field-group">
           <label class="field-label" for="loanAmount">
-            <span class="field-icon">💰</span>
+            <span class="field-icon"><i class="fa-solid fa-money-bill-wave"></i></span>
             مبلغ القرض المطلوب
           </label>
           <input id="loanAmount" type="number" class="field-input" min="1"
@@ -85,7 +86,7 @@
 
         <div class="field-group">
           <label class="field-label" for="applicantAge">
-            <span class="field-icon">👤</span>
+            <span class="field-icon"><i class="fa-solid fa-user"></i></span>
             عمر العميل
           </label>
           <input id="applicantAge" type="number" class="field-input" min="18" max="100"
@@ -97,7 +98,7 @@
 
         <div class="field-group">
           <label class="field-label" for="expectedRetirementAge">
-            <span class="field-icon">⏳</span>
+            <span class="field-icon"><i class="fa-solid fa-hourglass-half"></i></span>
             العمر المتوقع للتقاعد
           </label>
           <input id="expectedRetirementAge" type="number" class="field-input" min="19" max="100"
@@ -105,13 +106,25 @@
           <span class="field-error" id="expectedRetirementAgeError">
             ⚠ يجب أن يكون العمر المتوقع للتقاعد أكبر من عمر العميل
           </span>
-          <span class="field-error" id="retirementEligibilityError">
-            ⚠ غير مؤهل للتمويل، لعدم توفر مدة تمويل كافية قبل سن التقاعد.
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="postRetirementSalary">
+            <span class="field-icon"><i class="fa-solid fa-wallet"></i></span>
+            الراتب المتوقع بعد التقاعد (اختياري)
+          </label>
+          <input id="postRetirementSalary" type="number" class="field-input" min="0"
+                 placeholder="أدخل راتبك التقاعدي المتوقع (إن وجد)" />
+          <span class="field-hint">
+            يستخدم فقط إذا امتد التمويل إلى ما بعد سن التقاعد وذلك للحصول على تحليل أكثر دقة
           </span>
         </div>
 
         <div class="field-group">
-          <label class="field-label">مدة السداد</label>
+          <label class="field-label">
+            <span class="field-icon"><i class="fa-solid fa-calendar-days"></i></span>
+            مدة السداد
+          </label>
           <div class="slider-wrapper">
             <div class="slider-display">
               <span class="slider-value" id="sliderValue">3</span>
@@ -123,15 +136,12 @@
               <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
             </div>
           </div>
-          <span class="field-error" id="durationError">
-            ⚠ مدة التمويل تتجاوز الحد الأقصى المسموح به حسب عمرك
-          </span>
         </div>
 
 
         <div class="field-group">
           <label class="field-label" for="obligations">
-            <span class="field-icon">💳</span>
+            <span class="field-icon"><i class="fa-solid fa-file-invoice-dollar"></i></span>
             الالتزامات الشهرية الحالية
           </label>
           <input id="obligations" type="number" class="field-input" min="0"

@@ -387,6 +387,17 @@
   color: #94a3b8;
 }
 
+/* تحليل ما بعد التقاعد */
+.retirement-note {
+  border-right: 4px solid #f97316;
+}
+
+.retirement-note-text {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: #475569;
+}
+
 /* AI */
 .advisor-panel {
   border-right: 4px solid #e2e8f0;
