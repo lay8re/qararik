@@ -31,8 +31,8 @@ function calcProfitRate(type, salary, loanAmount, years) {
   if (type === 'personal') {
     return 3.0 + (years - 1) * 0.2;
   } else {
-    let rate = 4.0 + (years - 1) * 0.1;
-    if (salary > 0 && loanAmount > salary * 25) rate += 0.5;
+    let rate = 3.0 + (years - 1) * 0.06;
+    //if (salary > 0 && loanAmount > salary * 25) rate += 0.5;
     return rate;
   }
 }
