@@ -391,21 +391,8 @@ function updateDashboard() {
       return res.json();
     })
     .then(data => {
-      if (requestId !== advisorRequestId) return; 
-      const shownDti = Math.round(dti);
-const shownRemaining = Math.round(salary - obligations - monthly);
-
-let advisorMsg = "";
-
-if (shownDti <= 33) {
-  advisorMsg = `وضعك المالي آمن. نسبة الالتزامات ${shownDti}% ويبقى لديك ${shownRemaining} ريال بعد السداد.`;
-} else if (shownDti <= 45) {
-  advisorMsg = `الخيار ممكن لكن يحتاج حذر. نسبة الالتزامات ${shownDti}% ويبقى لديك ${shownRemaining} ريال بعد السداد.`;
-} else {
-  advisorMsg = `لا ننصح بهذا الخيار. نسبة الالتزامات ${shownDti}% وقد تسبب ضغط مالي عالي، الأفضل تقليل مبلغ القرض أو زيادة مدة السداد.`;
-}
-
-setAdvisorText(advisorMsg);
+      if (requestId !== advisorRequestId) return;
+      setAdvisorText(data.recommendation);
     })
     .catch(err => {
       if (requestId !== advisorRequestId) return;
@@ -417,7 +404,3 @@ setAdvisorText(advisorMsg);
 
 updateSidebarSlider(init.type);
 updateDashboard();
-
-
-
- 
