@@ -3,26 +3,22 @@ from google import genai
 
 
 def generate_ai_recommendation(result: dict) -> str:
-    """
-    يرسل النتائج المحسوبة مسبقًا إلى Gemini لتفسيرها فقط.
-    إذا تعطل Gemini، يرجع للتوصية الأصلية.
-    """
-
+    """يرسل النتائج المحسوبة إلى Gemini للتفسير فقط، مع توصية احتياطية عند الخطأ."""
     fallback = result.get("recommendation", "تعذر إنشاء التوصية.")
     api_key = os.getenv("GEMINI_API_KEY")
 
     if not api_key:
+        print("Gemini disabled: GEMINI_API_KEY is missing", flush=True)
         return fallback
 
     prompt = f"""
 أنت مستشار مالي متخصص في التمويل الشخصي والعقاري في المملكة العربية السعودية.
 
 فسّر النتائج التالية فقط، ولا تُعِد حسابها ولا تغيّر أي رقم:
-
-- القسط الشهري: {result["monthly_installment"]} ريال
-- نسبة الالتزامات DTI: {result["debt_ratio"]}%
-- الدخل المتبقي: {result["remaining_income"]} ريال
-- مستوى المخاطر: {result["risk_level"]}
+- القسط الشهري: {result['monthly_installment']} ريال
+- نسبة الالتزامات DTI: {result['debt_ratio']}%
+- الدخل المتبقي: {result['remaining_income']} ريال
+- مستوى المخاطر: {result['risk_level']}
 
 التزم بالتالي:
 - لا تخترع أي معلومات.
@@ -35,15 +31,18 @@ def generate_ai_recommendation(result: dict) -> str:
 
     try:
         client = genai.Client(api_key=api_key)
-
         response = client.models.generate_content(
-            model="gemini-3.5-flash",
+            model="gemini-2.5-flash",
             contents=prompt,
         )
-
         text = (response.text or "").strip()
-        return text if text else fallback
+        if text:
+            print("Gemini response generated successfully", flush=True)
+            return text
 
-    except Exception as error:
-        print(f"Gemini API error: {error}")
+        print("Gemini returned an empty response; using fallback", flush=True)
         return fallback
+    except Exception as error:
+        print(f"Gemini API error: {type(error).__name__}: {error}", flush=True)
+        return fallback
+
