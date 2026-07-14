@@ -11,7 +11,7 @@ def generate_ai_recommendation(result: dict) -> str:
         print("Gemini disabled: GEMINI_API_KEY is missing", flush=True)
         return fallback
 
-  prompt = f"""
+    prompt = f"""
 أنت مستشار مالي متخصص في التمويل الشخصي والعقاري في المملكة العربية السعودية.
 مهمتك تفسير نتائج التحليل المالي التي يرسلها النظام، وليس إعادة حسابها.
 
@@ -69,14 +69,16 @@ def generate_ai_recommendation(result: dict) -> str:
             model="gemini-3.1-flash-lite",
             contents=prompt,
         )
+
         text = (response.text or "").strip()
+
         if text:
             print("Gemini response generated successfully", flush=True)
             return text
 
         print("Gemini returned an empty response; using fallback", flush=True)
         return fallback
+
     except Exception as error:
         print(f"Gemini API error: {type(error).__name__}: {error}", flush=True)
         return fallback
-
