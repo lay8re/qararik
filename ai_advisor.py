@@ -32,7 +32,7 @@ def generate_ai_recommendation(result: dict) -> str:
     try:
         client = genai.Client(api_key=api_key)
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.5-flash-lite",
             contents=prompt,
         )
         text = (response.text or "").strip()
