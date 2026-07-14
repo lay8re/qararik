@@ -382,6 +382,7 @@ function updateDashboard() {
   loan_amount: loanAmount,
   years: duration,
   current_obligations: obligations,
+  monthly_installment: monthly,
   debt_ratio: dti,
   remaining_income: salary - obligations - monthly
 })
