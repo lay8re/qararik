@@ -1,7 +1,10 @@
 import os
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify, send_from_directory
 from ai_advisor import generate_ai_recommendation
 from loan_logic import analyze_loan
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -44,6 +47,10 @@ def analyze():
             monthly_installment=float(data.get("monthly_installment", 0)) or None,
             debt_ratio=float(data.get("debt_ratio", 0)) or None,
             remaining_income=float(data.get("remaining_income", 0)) or None,
+            financing_type=data.get("financing_type") or None,
+            applicant_age=float(data.get("applicant_age", 0)) or None,
+            expected_retirement_age=float(data.get("expected_retirement_age", 0)) or None,
+            post_retirement_salary=float(data.get("post_retirement_salary", 0)) or None,
         )
     except (TypeError, ValueError, ZeroDivisionError) as error:
         print(f"Analyze input error: {error}", flush=True)

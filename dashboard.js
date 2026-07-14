@@ -126,7 +126,7 @@ function analyzePostRetirement(applicantAge, expectedRetirementAge, duration, mo
 }
 
 /* 
-      صندوق "تحليل ما بعد التقاعد" (معلومة إضافية منفصلة فقط)
+     تحليل ما بعد التقاعد
       لا يغيّر أي مؤشر أساسي في الصفحة 
       - لا يمتد التمويل بعد التقاعد        → الصندوق مخفي بالكامل
       - يمتد ولا يوجد راتب متوقع بعد التقاعد → تنبيه بسيط فقط
@@ -182,11 +182,26 @@ function updateAdvisor(color) {
   panel.style.borderRightColor = color;
 }
 
+const ADVISOR_HEADINGS = ['التقييم العام', 'ملخص التحليل', 'التوصيات'];
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function formatAdvisorHtml(text) {
+  let html = escapeHtml(text.replace(/\r\n/g, '\n'));
+  ADVISOR_HEADINGS.forEach(heading => {
+    const headingLine = new RegExp(`(^|\\n)${heading}(\\n|$)`, 'g');
+    html = html.replace(headingLine, `$1<strong>${heading}</strong>$2`);
+  });
+  return html;
+}
+
 function setAdvisorText(text) {
   const textEl = document.getElementById('advisorText');
   textEl.style.opacity = '0';
   setTimeout(() => {
-    textEl.textContent   = text;
+    textEl.innerHTML     = formatAdvisorHtml(text);
     textEl.style.opacity = '1';
   }, 220);
 }
@@ -384,7 +399,11 @@ function updateDashboard() {
   current_obligations: obligations,
   monthly_installment: monthly,
   debt_ratio: dti,
-  remaining_income: salary - obligations - monthly
+  remaining_income: salary - obligations - monthly,
+  financing_type: type,
+  applicant_age: ApplicantAge,
+  expected_retirement_age: ExpectedRetirementAge,
+  post_retirement_salary: PostRetirementSalary
 })
   })
     .then(res => {
