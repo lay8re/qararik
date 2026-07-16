@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>بنك الإنماء</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/bank.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body class="bank-page">
+
+  <div class="bank-shell">
+
+    <div class="bank-hero">
+      <div class="bank-topbar">
+        <div class="bank-logo-mark">
+          <span class="bank-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="10" width="18" height="10" rx="1"></rect>
+              <path d="M3 10 12 4l9 6"></path>
+              <line x1="7" y1="14" x2="7" y2="17"></line>
+              <line x1="12" y1="14" x2="12" y2="17"></line>
+              <line x1="17" y1="14" x2="17" y2="17"></line>
+            </svg>
+          </span>
+          <span class="bank-logo-text">بنك الإنماء</span>
+        </div>
+        <div class="bank-topbar-icons">
+          <i class="fa-regular fa-bell"></i>
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </div>
+      </div>
+
+      <div class="bank-greeting">
+        <div>
+          <div class="bank-greeting-name">مرحباً، محمد</div>
+          <div class="bank-greeting-sub">نتمنى لك يوماً موفقاً</div>
+        </div>
+        <div class="bank-points">
+          <i class="fa-solid fa-star"></i>
+          <span id="bankPoints">3,240</span>
+        </div>
+      </div>
+
+      <div class="bank-balance-card">
+        <div class="bank-balance-head">
+          <span>الحساب الأساسي •••4726</span>
+          <i class="fa-regular fa-eye"></i>
+        </div>
+        <div class="bank-balance-amount">
+          <small>﷼</small> <span id="bankBalance">320,382.12</span>
+        </div>
+        <span class="bank-current-pill">الحساب الجاري</span>
+      </div>
+    </div>
+
+    <div class="bank-shortcuts">
+      <div class="bank-shortcut">
+        <div class="bank-shortcut-icon"><i class="fa-solid fa-right-left"></i></div>
+        <span>تحويل سريع</span>
+      </div>
+      <div class="bank-shortcut">
+        <div class="bank-shortcut-icon"><i class="fa-regular fa-credit-card"></i></div>
+        <span>البطاقات</span>
+      </div>
+      <div class="bank-shortcut">
+        <div class="bank-shortcut-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <span>فواتيري</span>
+      </div>
+      <div class="bank-shortcut">
+        <div class="bank-shortcut-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+        <span>شحن الجوال</span>
+      </div>
+    </div>
+
+    <div class="bank-card-section">
+      <p class="bank-section-title">بطاقة الحساب</p>
+      <div class="bank-visual-card">
+        <div class="bank-visual-card-info">
+          Infinite Credit Card
+          <b>•••4394</b>
+        </div>
+        <div class="bank-visual-card-brand">VISA</div>
+      </div>
+    </div>
+
+    <div class="bank-services-section">
+      <p class="bank-section-title">الخدمات</p>
+
+      <div class="bank-services-grid">
+        <div class="bank-service-tile">
+          <div class="bank-service-icon"><i class="fa-regular fa-user"></i></div>
+          <span>الحسابات</span>
+        </div>
+        <div class="bank-service-tile">
+          <div class="bank-service-icon"><i class="fa-regular fa-credit-card"></i></div>
+          <span>البطاقات</span>
+        </div>
+        <div class="bank-service-tile">
+          <div class="bank-service-icon"><i class="fa-solid fa-piggy-bank"></i></div>
+          <span>الادخار</span>
+        </div>
+        <div class="bank-service-tile">
+          <div class="bank-service-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <span>التأمين</span>
+        </div>
+      </div>
+
+      <div class="bank-smart-finance-card" id="smartFinanceCard">
+        <div class="bank-smart-finance-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <div class="bank-smart-finance-body">
+          <div class="bank-smart-finance-title">
+            طلب تمويل ذكي
+            <span class="bank-smart-finance-badge-new">جديد</span>
+          </div>
+          <p class="bank-smart-finance-desc" id="smartFinanceDesc">
+            حلّل أهليتك ، جرّب سيناريوهات التمويل ، ثم قدّم طلبك للبنك
+          </p>
+        </div>
+        <i class="fa-solid fa-chevron-left bank-smart-finance-arrow"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة الموافقة -->
+  <div class="bank-modal-overlay" id="consentOverlay">
+    <div class="bank-sheet bank-sheet-wrap">
+      <button class="bank-sheet-close" id="closeConsentBtn" aria-label="إغلاق">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="bank-sheet-handle"></div>
+      <div class="bank-sheet-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+      <h3 class="bank-sheet-title">طلب تمويل ذكي</h3>
+      <p class="bank-sheet-text">
+        يوفر بنك الإنماء خدمة تحليل أهلية التمويل عبر منصة "قرارك" ، حيث يمكنك تجربة سيناريوهات تمويل مختلفة
+        ومعرفة القسط الشهري المناسب لك قبل تقديم طلبك رسمياً
+      </p>
+      <button class="bank-sheet-btn" id="startFinanceBtn">ابدأ طلب التمويل</button>
+      <p class="bank-sheet-consent">
+        بموافقتك على المتابعة سيتم مشاركة بياناتك الأساسيةالموثقة مع منصة "قرارك" لتحليل أهلية التمويل
+        ومحاكاة السيناريوهات المالية ، مع الحفاظ على سرية بياناتك واستخدامها لغرض دراسةالطلب فقط
+      </p>
+    </div>
+  </div>
+
+  <script src="bank.js"></script>
+</body>
+</html>

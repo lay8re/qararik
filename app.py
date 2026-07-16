@@ -11,7 +11,6 @@ app = Flask(__name__)
 
 @app.after_request
 def disable_static_cache(response):
-    """يمنع المتصفح من استخدام نسخة JavaScript قديمة بعد النشر."""
     if request.path.endswith((".html", ".js")) or request.path == "/":
         response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
         response.headers["Pragma"] = "no-cache"
@@ -21,7 +20,7 @@ def disable_static_cache(response):
 
 @app.route("/")
 def home():
-    return send_from_directory(".", "index.html")
+    return send_from_directory(".", "bank-home.html")
 
 
 @app.route("/<path:filename>")

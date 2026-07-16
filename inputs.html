@@ -10,9 +10,12 @@
   <link rel="stylesheet" href="css/header.css" />
   <link rel="stylesheet" href="css/inputs.css" />
   <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/bank.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
+
+  <div class="bank-bridge-bar" id="bankBridgeBar" style="display:none;"></div>
 
   <canvas id="bg-canvas"></canvas>
 
@@ -33,6 +36,27 @@
 
       <form class="input-form" id="inputForm" onsubmit="return false">
 
+        <div class="bank-data-banner" id="bankDataBanner" style="display:none;">
+          <span class="bank-context-chip"><span class="dot"></span> بيانات موثقة من بنك الإنماء</span>
+
+          <div class="field-group">
+            <label class="field-label" for="bankName">
+              <span class="field-icon"><i class="fa-solid fa-id-card"></i></span>
+              الاسم
+              <span class="bank-badge">موثق من البنك</span>
+            </label>
+            <input id="bankName" type="text" class="field-input locked-field" readonly tabindex="-1" />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="bankEmployer">
+              <span class="field-icon"><i class="fa-solid fa-building"></i></span>
+              جهة العمل
+              <span class="bank-badge">موثق من البنك</span>
+            </label>
+            <input id="bankEmployer" type="text" class="field-input locked-field" readonly tabindex="-1" />
+          </div>
+        </div>
 
         <div class="field-group">
           <label class="field-label">نوع البرنامج التمويلي</label>
@@ -62,11 +86,12 @@
           <label class="field-label" for="salary">
             <span class="field-icon"><i class="fa-solid fa-wallet"></i></span>
             الراتب الشهري
+            <span class="bank-badge" id="salaryBankBadge" style="display:none;">موثق من البنك</span>
           </label>
           <input id="salary" type="number" class="field-input" min="1"
                  placeholder="أدخل راتبك الشهري بالريال" />
           <span class="field-error" id="salaryError">
-            ⚠ الرجاء إدخال الراتب الشهري
+            ⚠ الحد الأدنى لصافي الراتب يبدأ من 3000 ريال
           </span>
         </div>
 
@@ -88,11 +113,12 @@
           <label class="field-label" for="applicantAge">
             <span class="field-icon"><i class="fa-solid fa-user"></i></span>
             عمر العميل
+            <span class="bank-badge" id="applicantAgeBankBadge" style="display:none;">موثق من البنك</span>
           </label>
           <input id="applicantAge" type="number" class="field-input" min="18" max="100"
                  placeholder="أدخل عمرك الحالي" />
           <span class="field-error" id="applicantAgeError">
-            ⚠ الرجاء إدخال عمر العميل
+            ⚠ الحد الأدنى للعمر المسموح به للتمويل هو 18 سنة
           </span>
         </div>
 
@@ -142,16 +168,26 @@
         <div class="field-group">
           <label class="field-label" for="obligations">
             <span class="field-icon"><i class="fa-solid fa-file-invoice-dollar"></i></span>
-            الالتزامات الشهرية الحالية
+            الالتزامات المالية الموثقة
+            <span class="bank-badge" id="obligationsBankBadge" style="display:none;">موثق من البنك</span>
           </label>
           <input id="obligations" type="number" class="field-input" min="0"
                  placeholder="أدخل مجموع أقساطك الحالية إن وجدت، أو اكتب 0" />
-          <span class="field-error" id="obligationsError">
-            ⚠ الرجاء إدخال الالتزامات الحالية (أو اكتب 0 إن لم يكن لديك)
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="additionalObligations">
+            <span class="field-icon"><i class="fa-solid fa-file-invoice-dollar"></i></span>
+            التزامات شهرية إضافية
+          </label>
+          <input id="additionalObligations" type="number" class="field-input" min="0"
+                 placeholder="مثل الإيجار أو النفقة أو مصروفات المدارس (إن وجدت)" />
+          <span class="field-hint">
+            أي التزامات شهرية ثابتة لا تظهر لدى البنك
           </span>
         </div>
 
-     
+
         <button type="button" class="start-btn" id="startBtn">
           ابدأ المحاكاة الذكية 
         </button>

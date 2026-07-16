@@ -2,6 +2,7 @@
 const saved    = JSON.parse(localStorage.getItem('qararikData') || '{}');
 const DEFAULTS = {
   type: 'personal', salary: 10000, loanAmount: 50000, duration: 3, obligations: 0,
+  additionalObligations: 0,
   applicantAge: 30, expectedRetirementAge: 60, postRetirementSalary: 0
 };
 const init     = { ...DEFAULTS, ...saved };
@@ -13,9 +14,33 @@ document.getElementById('dashLoan').value        = init.loanAmount;
 document.getElementById('dashDuration').max      = init.type === 'personal' ? 5 : 30;
 document.getElementById('dashDuration').value    = init.duration;
 document.getElementById('dashObligations').value = init.obligations;
+document.getElementById('dashAdditionalObligations').value = init.additionalObligations || '';
 document.getElementById('dashApplicantAge').value          = init.applicantAge;
 document.getElementById('dashExpectedRetirementAge').value = init.expectedRetirementAge;
 document.getElementById('dashPostRetirementSalary').value   = init.postRetirementSalary || '';
+
+/*
+  رحلة "قرارك" عبر البنك: البيانات الموثقة من البنك تبقى مقفلة هنا أيضاً،
+  ويظهر زر تقديم الطلب للبنك فقط في هذا المسار، دون أي تأثير على الاستخدام المباشر للمنصة.
+*/
+const BANK_FLOW = !!init.fromBank;
+
+function lockDashField(inputId, badgeId) {
+  const input = document.getElementById(inputId);
+  const badge = document.getElementById(badgeId);
+  input.readOnly = true;
+  input.tabIndex = -1;
+  input.classList.add('locked-field');
+  if (badge) badge.style.display = 'inline-flex';
+}
+
+if (BANK_FLOW) {
+  document.getElementById('bankBridgeBar').style.display = 'block';
+  document.getElementById('bankSubmitSection').style.display = '';
+  lockDashField('dashSalary', 'dashSalaryBankBadge');
+  lockDashField('dashApplicantAge', 'dashApplicantAgeBankBadge');
+  lockDashField('dashObligations', 'dashObligationsBankBadge');
+}
 
 
 let needleAngle = -90;
@@ -174,6 +199,17 @@ function animateNeedle(targetAngle) {
 }
 
 
+function setBankSubmitEligibility(eligible) {
+  if (!BANK_FLOW) return;
+  const btn  = document.getElementById('submitToBankBtn');
+  const hint = document.getElementById('submitHint');
+  btn.disabled = !eligible;
+  hint.classList.toggle('is-eligible', eligible);
+  hint.textContent = eligible
+    ? 'وضعك المالي مؤهل حالياً لتقديم طلب التمويل إلى البنك.'
+    : 'يتفعّل هذا الزر عند انخفاض نسبة الاستقطاع عن 30% ومستوى المخاطر منخفض.';
+}
+
 function updateAdvisor(color) {
   const panel = document.getElementById('advisorPanel');
   const dot   = document.getElementById('advisorDot');
@@ -301,6 +337,7 @@ function persistDashboardState() {
     loanAmount:            +document.getElementById('dashLoan').value        || 0,
     duration:              +document.getElementById('dashDuration').value    || 1,
     obligations:           +document.getElementById('dashObligations').value || 0,
+    additionalObligations: +document.getElementById('dashAdditionalObligations').value || 0,
     applicantAge:          +document.getElementById('dashApplicantAge').value          || 0,
     expectedRetirementAge: +document.getElementById('dashExpectedRetirementAge').value || 0,
     postRetirementSalary:  +document.getElementById('dashPostRetirementSalary').value  || 0
@@ -315,7 +352,14 @@ function updateDashboard() {
   const salary      = +document.getElementById('dashSalary').value      || 0;
   const loanAmount  = +document.getElementById('dashLoan').value        || 0;
   const duration    = +document.getElementById('dashDuration').value    || 1;
-  const obligations = +document.getElementById('dashObligations').value || 0;
+  const obligations           = +document.getElementById('dashObligations').value           || 0;
+  const additionalObligations = +document.getElementById('dashAdditionalObligations').value  || 0;
+
+  /*
+    إجمالي الالتزامات = الالتزامات المالية الموثقة (من البنك) + الالتزامات الشهرية الإضافية (يدوية)
+    كل الحسابات والمؤشرات والتوصيات أدناه تعتمد على هذا المتغير الموحّد فقط.
+  */
+  const totalObligations = obligations + additionalObligations;
 
   if (salary <= 0 || loanAmount <= 0) return;
 
@@ -345,12 +389,13 @@ function updateDashboard() {
     advisorRequestId++; // إبطال أي رد سابق من Flask قيد التحميل
     setAdvisorText(`لا يمكن إتمام الحساب: ${eligibilityMessage}`);
     document.getElementById('retirementNote').style.display = 'none';
+    setBankSubmitEligibility(false);
     return;
   }
 
   const rate                     = calcProfitRate(type, salary, loanAmount, duration);
   const { monthly, totalProfit } = calcPayment(loanAmount, rate, duration);
-  const dti                      = calcDTI(monthly, obligations, salary);
+  const dti                      = calcDTI(monthly, totalObligations, salary);
   const zone                     = getZone(dti);
   const { color, label }         = zone;
 
@@ -376,13 +421,15 @@ function updateDashboard() {
   document.getElementById('gaugeRate').textContent    = rate.toFixed(1) + '%';
 
 
-  updateChart(monthly, obligations, salary);
+  updateChart(monthly, totalObligations, salary);
 
 
   document.getElementById('sbMonthly').textContent     = fmtNum(Math.round(monthly))    + ' ريال';
   document.getElementById('sbRate').textContent        = rate.toFixed(1)                 + '%';
   document.getElementById('sbTotalProfit').textContent = fmtNum(Math.round(totalProfit)) + ' ريال';
 
+
+  setBankSubmitEligibility(dti < 30 && zone.key === 'green');
 
   updateAdvisor(color);
   setAdvisorText('جاري تحليل بياناتك...');
@@ -396,10 +443,10 @@ function updateDashboard() {
   salary: salary,
   loan_amount: loanAmount,
   years: duration,
-  current_obligations: obligations,
+  current_obligations: totalObligations,
   monthly_installment: monthly,
   debt_ratio: dti,
-  remaining_income: salary - obligations - monthly,
+  remaining_income: salary - totalObligations - monthly,
   financing_type: type,
   applicant_age: ApplicantAge,
   expected_retirement_age: ExpectedRetirementAge,
@@ -424,3 +471,38 @@ function updateDashboard() {
 
 updateSidebarSlider(init.type);
 updateDashboard();
+
+/*
+  محاكاة تقديم الطلب إلى البنك — لا يتم إرسال أي بيانات حقيقية،
+  هذه محاكاة بصرية فقط لتكامل مستقبلي مع البنك.
+*/
+if (BANK_FLOW) {
+  const confirmOverlay = document.getElementById('confirmOverlay');
+  const processOverlay = document.getElementById('bankProcessOverlay');
+  const processLoading = document.getElementById('bankProcessLoading');
+  const processSuccess = document.getElementById('bankProcessSuccess');
+
+  document.getElementById('submitToBankBtn').addEventListener('click', () => {
+    confirmOverlay.classList.add('is-open');
+  });
+
+  document.getElementById('confirmCancelBtn').addEventListener('click', () => {
+    confirmOverlay.classList.remove('is-open');
+  });
+
+  document.getElementById('confirmSubmitBtn').addEventListener('click', () => {
+    confirmOverlay.classList.remove('is-open');
+    processLoading.style.display = '';
+    processSuccess.style.display = 'none';
+    processOverlay.classList.add('is-open');
+
+    setTimeout(() => {
+      processLoading.style.display = 'none';
+      processSuccess.style.display = '';
+    }, 1800);
+  });
+
+  document.getElementById('backToBankBtn').addEventListener('click', () => {
+    window.location.href = 'bank-home.html?submitted=1';
+  });
+}

@@ -1,6 +1,42 @@
 
 let selectedType = null;
 
+/*
+  رحلة "قرارك" عبر البنك: إذا وصل المستخدم من الصفحة الرئيسية لبنك الإنماء،
+  تُعبَّأ بياناته الموثقة تلقائياً وتُقفل، دون التأثير على الاستخدام المباشر للمنصة.
+*/
+const BANK_FLOW = localStorage.getItem('qararikFromBank') === '1';
+const bankData  = BANK_FLOW ? JSON.parse(localStorage.getItem('qararikBankData') || '{}') : null;
+
+function lockBankField(inputId, badgeId) {
+  const input = document.getElementById(inputId);
+  const badge = document.getElementById(badgeId);
+  input.readOnly = true;
+  input.tabIndex = -1;
+  input.classList.add('locked-field');
+  if (badge) badge.style.display = 'inline-flex';
+}
+
+function applyBankFlow() {
+  if (!BANK_FLOW || !bankData) return;
+
+  document.getElementById('bankBridgeBar').style.display = 'block';
+  document.getElementById('bankDataBanner').style.display = 'flex';
+
+  document.getElementById('bankName').value     = bankData.name || '';
+  document.getElementById('bankEmployer').value = bankData.employer || '';
+
+  document.getElementById('salary').value       = bankData.salary;
+  document.getElementById('applicantAge').value = bankData.applicantAge;
+  document.getElementById('obligations').value  = bankData.obligations;
+
+  lockBankField('salary', 'salaryBankBadge');
+  lockBankField('applicantAge', 'applicantAgeBankBadge');
+  lockBankField('obligations', 'obligationsBankBadge');
+}
+
+applyBankFlow();
+
 
 function selectType(type) {
   selectedType = type;
@@ -62,17 +98,8 @@ function markInvalid(inputId) { document.getElementById(inputId).classList.add('
 function markValid(inputId)   { document.getElementById(inputId).classList.remove('invalid'); }
 
 // delete error message
-document.getElementById('salary').addEventListener('input', function () {
-  if (+this.value > 0) { hideError('salaryError'); markValid('salary'); }
-});
 document.getElementById('loanAmount').addEventListener('input', function () {
   if (+this.value > 0) { hideError('loanError'); markValid('loanAmount'); }
-});
-document.getElementById('obligations').addEventListener('input', function () {
-  if (this.value !== '') { hideError('obligationsError'); markValid('obligations'); }
-});
-document.getElementById('applicantAge').addEventListener('input', function () {
-  if (+this.value > 0) { hideError('applicantAgeError'); markValid('applicantAge'); }
 });
 document.getElementById('expectedRetirementAge').addEventListener('input', function () {
   hideError('expectedRetirementAgeError');
@@ -93,11 +120,7 @@ function validateForm() {
 
 
   const salary = +document.getElementById('salary').value;
-  if (!salary || salary <= 0) {
-    document.getElementById('salaryError').textContent = '⚠ الرجاء إدخال الراتب الشهري';
-    showError('salaryError'); markInvalid('salary'); valid = false;
-  } else if (salary < 3000) {
-    document.getElementById('salaryError').textContent = '⚠ الحد الأدنى لصافي الراتب يبدأ من 3000 ريال';
+  if (salary < 3000) {
     showError('salaryError'); markInvalid('salary'); valid = false;
   } else {
     hideError('salaryError'); markValid('salary');
@@ -110,21 +133,10 @@ function validateForm() {
     hideError('loanError'); markValid('loanAmount');
   }
 
-  const obligations = document.getElementById('obligations').value;
-  if (obligations === '') {
-    showError('obligationsError'); markInvalid('obligations'); valid = false;
-  } else {
-    hideError('obligationsError'); markValid('obligations');
-  }
-
   hideError('expectedRetirementAgeError');
 
   const ApplicantAge = +document.getElementById('applicantAge').value;
-  if (!ApplicantAge || ApplicantAge <= 0) {
-    document.getElementById('applicantAgeError').textContent = '⚠ الرجاء إدخال عمر العميل';
-    showError('applicantAgeError'); markInvalid('applicantAge'); valid = false;
-  } else if (ApplicantAge < 18) {
-    document.getElementById('applicantAgeError').textContent = '⚠ الحد الأدنى للعمر المسموح به للتمويل هو 18 سنة';
+  if (ApplicantAge < 18) {
     showError('applicantAgeError'); markInvalid('applicantAge'); valid = false;
   } else {
     hideError('applicantAgeError'); markValid('applicantAge');
@@ -158,9 +170,11 @@ document.getElementById('startBtn').addEventListener('click', function () {
     loanAmount:             +document.getElementById('loanAmount').value,
     duration:               +document.getElementById('durationSlider').value,
     obligations:            +document.getElementById('obligations').value,
+    additionalObligations:  +document.getElementById('additionalObligations').value || 0,
     applicantAge:           +document.getElementById('applicantAge').value,
     expectedRetirementAge:  +document.getElementById('expectedRetirementAge').value,
-    postRetirementSalary:   +document.getElementById('postRetirementSalary').value || 0
+    postRetirementSalary:   +document.getElementById('postRetirementSalary').value || 0,
+    fromBank:               BANK_FLOW
   }));
 
   this.disabled = true;

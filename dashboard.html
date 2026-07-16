@@ -10,10 +10,13 @@
   <link rel="stylesheet" href="css/header.css" />
   <link rel="stylesheet" href="css/dashboard.css" />
   <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/bank.css" />
   <!-- Chart.js  -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
+
+  <div class="bank-bridge-bar" id="bankBridgeBar" style="display:none;"></div>
 
   <canvas id="bg-canvas"></canvas>
 
@@ -44,7 +47,7 @@
 
     
           <div class="sb-field">
-            <label class="sb-label">الراتب الشهري (ريال)</label>
+            <label class="sb-label">الراتب الشهري (ريال) <span class="bank-badge" id="dashSalaryBankBadge" style="display:none;">موثق من البنك</span></label>
             <input id="dashSalary" type="number" class="sb-input"
                    min="1" placeholder="0" oninput="updateDashboard()" />  <!-- يشتغل مع كل ضغطة بالكيبورد اسرع-->
           </div>
@@ -56,7 +59,7 @@
           </div>
 
           <div class="sb-field">
-            <label class="sb-label">عمر العميل</label>
+            <label class="sb-label">عمر العميل <span class="bank-badge" id="dashApplicantAgeBankBadge" style="display:none;">موثق من البنك</span></label>
             <input id="dashApplicantAge" type="number" class="sb-input"
                    min="18" max="100" placeholder="0" oninput="updateDashboard()" />
           </div>
@@ -90,12 +93,18 @@
           </div>
 
           <div class="sb-field">
-            <label class="sb-label">الالتزامات الشهرية (ريال)</label>
+            <label class="sb-label">الالتزامات المالية الموثقة (ريال) <span class="bank-badge" id="dashObligationsBankBadge" style="display:none;">موثق من البنك</span></label>
             <input id="dashObligations" type="number" class="sb-input"
                    min="0" placeholder="0 إن لم يكن لديك" oninput="updateDashboard()" />
           </div>
 
-     
+          <div class="sb-field">
+            <label class="sb-label">التزامات شهرية إضافية (ريال)</label>
+            <input id="dashAdditionalObligations" type="number" class="sb-input"
+                   min="0" placeholder="إيجار، نفقة، مصروفات مدارس..." oninput="updateDashboard()" />
+          </div>
+
+
           <div class="sb-summary">
             <div class="sb-stat">
               <span class="sb-stat-lbl">القسط الشهري</span>
@@ -220,7 +229,50 @@
         </p>
       </div>
 
+      <!-- تظهر فقط عند الوصول عبر رحلة بنك الإنماء -->
+      <div class="dash-card bank-submit-card" id="bankSubmitSection" style="display:none;">
+        <p class="card-label">تقديم الطلب للبنك</p>
+        <button class="bank-submit-btn" id="submitToBankBtn" disabled>تقديم طلب تمويل مؤهل</button>
+        <p class="bank-submit-hint" id="submitHint">
+          يتفعّل هذا الزر عند انخفاض نسبة الاستقطاع عن 30% ومستوى المخاطر منخفض.
+        </p>
+      </div>
+
     </main>
+  </div>
+
+  <!-- نافذة تأكيد تقديم الطلب -->
+  <div class="bank-confirm-overlay" id="confirmOverlay">
+    <div class="bank-confirm-box">
+      <h3 class="bank-confirm-title">تأكيد تقديم الطلب</h3>
+      <p class="bank-confirm-text">
+        سيتم إرسال نتائج التحليل والبيانات المطلوبة إلى البنك لاستكمال إجراءات دراسة طلب التمويل.<br>
+        هل ترغب بالمتابعة؟
+      </p>
+      <div class="bank-confirm-actions">
+        <button class="bank-confirm-cancel" id="confirmCancelBtn">إلغاء</button>
+        <button class="bank-confirm-ok" id="confirmSubmitBtn">تأكيد</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- شاشة إرسال الطلب (تحميل ثم نجاح) -->
+  <div class="bank-process-overlay" id="bankProcessOverlay">
+    <div class="bank-process-panel">
+      <div id="bankProcessLoading">
+        <div class="loading-spinner">
+          <div class="spinner-ring spinner-outer"></div>
+          <div class="spinner-ring spinner-inner"></div>
+        </div>
+        <p class="loading-text">جاري إرسال طلبك إلى البنك...</p>
+      </div>
+      <div id="bankProcessSuccess" style="display:none;">
+        <div class="bank-success-check">✓</div>
+        <h3 class="bank-success-title">تم إرسال طلب التمويل بنجاح</h3>
+        <p class="bank-success-text">تم استلام طلبك وسيقوم البنك بمراجعته واستكمال الإجراءات.</p>
+        <button class="bank-submit-btn" id="backToBankBtn">العودة إلى البنك</button>
+      </div>
+    </div>
   </div>
 
   <script src="script.js"></script>

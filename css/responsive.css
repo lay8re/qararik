@@ -122,20 +122,6 @@
   .site-header {
     padding: 16px 24px;
   }
-
-  .hero {
-    padding: 32px 20px;
-    min-height: calc(100vh - 72px);
-  }
-
-  .hero-content {
-    gap: 22px;
-  }
-
-  .cta-btn {
-    padding: 13px 28px;
-    font-size: 0.97rem;
-  }
 }
 
 
@@ -163,16 +149,3 @@
   .type-name     { font-size: 0.82rem; }
 }
 
-@media (max-width: 480px) {
-  .logo-name {
-    font-size: 1.15rem;
-  }
-
-  .hero-title {
-    font-size: 1.75rem;
-  }
-
-  .hero-subtitle {
-    font-size: 0.95rem;
-  }
-}

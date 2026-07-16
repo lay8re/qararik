@@ -19,10 +19,3 @@
   object-fit: contain;
   border-radius: 10px;
 }
-
-.logo-name {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--primary-color);
-  letter-spacing: -0.3px;
-}
