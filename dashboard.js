@@ -207,7 +207,7 @@ function setBankSubmitEligibility(eligible) {
   hint.classList.toggle('is-eligible', eligible);
   hint.textContent = eligible
     ? 'وضعك المالي مؤهل حالياً لتقديم طلب التمويل إلى البنك.'
-    : 'يتفعّل هذا الزر عند انخفاض نسبة الاستقطاع عن 30% ومستوى المخاطر منخفض.';
+    : 'يتفعّل هذا الزر عند انخفاض نسبة الاستقطاع عن 33% ومستوى المخاطر منخفض.';
 }
 
 function updateAdvisor(color) {
@@ -429,7 +429,7 @@ function updateDashboard() {
   document.getElementById('sbTotalProfit').textContent = fmtNum(Math.round(totalProfit)) + ' ريال';
 
 
-  setBankSubmitEligibility(dti < 30 && zone.key === 'green');
+  setBankSubmitEligibility(zone.key === 'green');
 
   updateAdvisor(color);
   setAdvisorText('جاري تحليل بياناتك...');
