@@ -115,6 +115,12 @@
 
   .gauge-nums { gap: 6px; }
   .gauge-num  { padding: 8px 6px; }
+
+  .bank-hero { padding: 18px 16px 54px; }
+  .bank-balance-amount { font-size: 1.6rem; }
+  .bank-services-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .bank-shortcuts { padding: 18px 16px 0; }
+  .bank-card-section, .bank-services-section { padding-inline: 16px; }
 }
 
 

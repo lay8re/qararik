@@ -1,11 +1,5 @@
-/*
-  bank.css
-  يغطي: الصفحة الرئيسية لبنك الإنماء (B2B demo)، شارات "موثق من البنك"،
-  الحقول المقفلة القادمة من البنك، ونافذة/شاشة تقديم الطلب داخل لوحة التحكم.
-  لا يغيّر أي ملف CSS موجود مسبقًا.
-*/
 
-:root {
+ :root {
   --bank-navy:      #10202f;
   --bank-navy-2:    #17293b;
   --bank-accent:    #e2a184;
@@ -14,7 +8,7 @@
   --bank-text-dark: #16232f;
 }
 
-/* ============ شارة "موثق من البنك" ============ */
+/*  "موثق من البنك"  */
 .bank-badge {
   display: inline-flex;
   align-items: center;
@@ -35,7 +29,7 @@
   font-weight: 800;
 }
 
-/* ============ حقول مقفلة قادمة من البنك ============ */
+/*  حقول مقفلة من البنك */
 .locked-field,
 .sb-input.locked-field,
 .field-input.locked-field {
@@ -48,7 +42,7 @@
 
 .locked-field:focus { box-shadow: none !important; }
 
-/* شريط علوي رفيع يربط بصريًا بين هوية البنك ومنصة قرارك */
+
 .bank-bridge-bar {
   position: relative;
   z-index: 11;
@@ -96,10 +90,6 @@
   align-items: center;
   gap: 6px;
 }
-
-/* =====================================================
-   صفحة بنك الإنماء (الرئيسية)
-   ===================================================== */
 
 .bank-page {
   min-height: 100vh;
@@ -232,7 +222,7 @@
   border-radius: 20px;
 }
 
-/* اختصارات بنكية مبسطة */
+
 .bank-shortcuts {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -267,7 +257,7 @@
   line-height: 1.3;
 }
 
-/* بطاقة الحساب المرئية */
+
 .bank-card-section {
   padding: 22px 20px 0;
 }
@@ -308,7 +298,7 @@
   letter-spacing: 0.5px;
 }
 
-/* قسم الخدمات */
+
 .bank-services-section {
   padding: 26px 20px 30px;
 }
@@ -347,7 +337,7 @@
   color: #475569;
 }
 
-/* بطاقة الخدمة المميزة: طلب تمويل ذكي */
+/* طلب تمويل ذكي */
 .bank-smart-finance-card {
   position: relative;
   background: #ffffff;
@@ -430,7 +420,6 @@
   align-self: center;
 }
 
-/* ============ نافذة الموافقة (Bottom Sheet) ============ */
 .bank-modal-overlay {
   position: fixed;
   inset: 0;
@@ -538,9 +527,6 @@
 
 .bank-sheet-wrap { position: relative; }
 
-/* =====================================================
-   لوحة التحكم: قسم تقديم الطلب للبنك
-   ===================================================== */
 
 .bank-submit-card {
   border: 1.5px solid var(--bank-accent);
@@ -584,7 +570,6 @@
   font-weight: 600;
 }
 
-/* نافذة التأكيد */
 .bank-confirm-overlay {
   position: fixed;
   inset: 0;
@@ -653,7 +638,6 @@
 
 .bank-confirm-ok:hover { background: var(--bank-navy-2); }
 
-/* شاشة إرسال الطلب (تحميل + نجاح) */
 .bank-process-overlay {
   position: fixed;
   inset: 0;
@@ -709,11 +693,3 @@
   margin-bottom: 26px;
 }
 
-/* ============ Responsive ============ */
-@media (max-width: 480px) {
-  .bank-hero { padding: 18px 16px 54px; }
-  .bank-balance-amount { font-size: 1.6rem; }
-  .bank-services-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
-  .bank-shortcuts { padding: 18px 16px 0; }
-  .bank-card-section, .bank-services-section { padding-inline: 16px; }
-}
